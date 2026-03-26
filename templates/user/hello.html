@@ -1,0 +1,656 @@
+scanner.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>SCANSTORY| {{ project_name }}</title>
+
+<style>
+  body{font-family:Arial,sans-serif;background:#050505;padding:12px;text-align:center;color:white;}
+  .wrap{
+    position:relative;width:100%;max-width:520px;margin:0 auto;
+    border-radius:12px;overflow:hidden;background:#000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  #cam{width:100%;height:auto;display:block;object-fit:cover}
+
+  #overlayWrap{
+    position:absolute;left:0;top:0;width:100%;height:100%;
+    display:none;pointer-events:none;transform-origin:0 0;
+    will-change:transform;
+  }
+  #overlay{
+    width:100%;height:100%;object-fit:cover;
+    transform-origin:center center;
+  }
+
+  #wm{
+    position:absolute;
+    left:10px;
+    bottom:10px;
+    padding:6px 10px;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    color:rgba(255,255,255,0.78);
+    background:rgba(0,0,0,0.18);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:8px;
+    text-transform:uppercase;
+    z-index:5;
+    pointer-events:none;
+    user-select:none;
+    mix-blend-mode:screen;
+    backdrop-filter: blur(4px);
+  }
+
+  .status{
+    margin-top:10px;padding:10px 15px;font-weight:700;
+    border-radius:8px;display:inline-block;min-width:150px;
+  }
+  .scan{background:rgba(255, 0, 122, 0.2);color:#ff007a;border:1px solid rgba(255, 0, 122, 0.3);}
+  .ok{background:rgba(0, 212, 255, 0.2);color:#00d4ff;border:1px solid rgba(0, 212, 255, 0.3);}
+  .track{background:rgba(112, 0, 255, 0.2);color:#7000ff;border:1px solid rgba(112, 0, 255, 0.3);}
+
+  #soundGate{
+    position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.8);z-index:50;color:#fff;font-weight:800;
+    text-align:center;padding:18px;backdrop-filter:blur(10px);
+  }
+  #soundBtn{
+    margin-top:12px;padding:12px 20px;border:0;border-radius:8px;font-size:16px;
+    background:linear-gradient(135deg, #ff007a, #7000ff);color:white;font-weight:bold;
+    cursor:pointer;transition:all 0.3s;
+  }
+  #soundBtn:hover{
+    transform:translateY(-2px);box-shadow:0 5px 15px rgba(255,0,122,0.3);
+  }
+
+  .header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:15px;padding:0 10px;
+  }
+  .header h3{
+    margin:0;font-size:20px;background:linear-gradient(to right, #fff, #00d4ff, #ff007a);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .back-btn{
+    background:rgba(255,255,255,0.05);color:white;border:1px solid rgba(255,255,255,0.1);
+    padding:8px 15px;border-radius:50px;text-decoration:none;font-size:14px;
+    transition:all 0.3s;display:flex;align-items:center;gap:5px;
+  }
+  .back-btn:hover{
+    background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);
+  }
+
+  .info-badge{
+    position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);
+    color:#00d4ff;padding:5px 10px;border-radius:20px;font-size:12px;
+    display:none;z-index:40;border:1px solid rgba(0,212,255,0.3);
+  }
+
+  .loading-spinner{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);
+    border-top:3px solid #00d4ff;border-radius:50%;animation:spin 1s linear infinite;
+    display:none;z-index:30;
+  }
+
+  @keyframes spin {
+    0% { transform:translate(-50%,-50%) rotate(0deg); }
+    100% { transform:translate(-50%,-50%) rotate(360deg); }
+  }
+
+  .match-indicator{
+    position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+    background:rgba(0,0,0,0.7);color:white;padding:8px 15px;
+    border-radius:20px;font-size:12px;display:none;z-index:40;
+    border:1px solid rgba(0,212,255,0.3);
+  }
+</style>
+
+<script>
+  window.Module = {
+    locateFile: function(path){
+      return "{{ url_for('static', filename='js/') }}" + path;
+    }
+  };
+</script>
+<script async src="{{ url_for('static', filename='js/opencv.js') }}"></script>
+</head>
+
+<body>
+  <div class="header">
+    <a href="/dashboard" class="back-btn">← Back</a>
+    <h3>SCANSTORY</h3>
+    <div style="width:80px"></div>
+  </div>
+
+<div class="wrap" id="wrap">
+  <video id="cam" autoplay playsinline></video>
+
+  <div id="overlayWrap">
+    <video id="overlay" autoplay playsinline loop muted preload="auto"></video>
+    <div id="wm">M PRO9 PVT. LTD.</div>
+  </div>
+
+  <div id="soundGate">
+    <div>
+      Audio is blocked by your browser.<br>
+      Tap once to enable sound.
+      <div><button id="soundBtn">Enable Sound</button></div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" id="loadingSpinner"></div>
+  <div class="info-badge" id="infoBadge">Pair: 0</div>
+  <div class="match-indicator" id="matchIndicator">Matched!</div>
+</div>
+
+<canvas id="cap" hidden></canvas>
+
+<div id="status" class="status scan">Loading OpenCV…</div>
+
+<script>
+// ================================================
+// ✅ SCANNER SESSION COUNTING (NEW)
+// ================================================
+const PROJECT_ID = {{ project_id }};
+let scannerSessionCounted = false;
+let scannerSessionId = null;
+
+// Generate unique session ID
+function generateScannerSessionId() {
+  return 'scanner_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Count scanner session (called once when scanner opens)
+function countScannerSession() {
+  if (scannerSessionCounted) return;
+  
+  fetch('/count-scanner-session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      project_id: PROJECT_ID,
+      session_id: scannerSessionId
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      scannerSessionCounted = true;
+      console.log('Scanner session counted:', scannerSessionId);
+    }
+  })
+  .catch(error => {
+    console.error('Error counting scanner session:', error);
+  });
+}
+
+// Initialize session when page loads
+window.addEventListener('load', function() {
+  scannerSessionId = generateScannerSessionId();
+  // Count scanner session immediately when scanner opens
+  countScannerSession();
+});
+
+// Optional: Log when user leaves
+window.addEventListener('beforeunload', function() {
+  console.log('Scanner session ending:', scannerSessionId);
+});
+
+// ================================================
+// ✅ YOUR ORIGINAL DETECTION LOGIC (UNCHANGED)
+// ================================================
+const cam = document.getElementById("cam");
+const wrap = document.getElementById("wrap");
+
+const overlayWrap = document.getElementById("overlayWrap");
+const overlay = document.getElementById("overlay");
+
+const cap = document.getElementById("cap");
+const ctx = cap.getContext("2d", { willReadFrequently:true });
+
+const statusDiv = document.getElementById("status");
+const soundGate = document.getElementById("soundGate");
+const soundBtn = document.getElementById("soundBtn");
+const loadingSpinner = document.getElementById("loadingSpinner");
+const infoBadge = document.getElementById("infoBadge");
+const matchIndicator = document.getElementById("matchIndicator");
+
+const DETECT_W = 480;
+const DETECT_INTERVAL_MS = 250;
+
+const MIN_GOOD_POINTS = 28;
+const MAX_ERR = 35;
+const RANSAC_REPROJ = 3.0;
+
+const SMOOTH = 0.65;
+
+const FLIP_X = false;
+const FLIP_Y = false;
+overlay.style.transform = `scale(${FLIP_X ? -1 : 1}, ${FLIP_Y ? -1 : 1})`;
+
+let videoFinished = true;
+overlay.addEventListener("ended", () => { videoFinished = true; });
+
+let cvReady = false;
+let tracking = false;
+let detectInFlight = false;
+
+let frameW = 0, frameH = 0;
+
+let prevGray = null;
+let prevPts  = null;
+let currCorners = null;
+
+let lastOrdered = null;
+let smoothCorners = null;
+let lastLockTs = 0;
+
+let currentVideoUrl = null;
+let currentPairId = -1;
+
+async function tryAutoEnableAudio(){
+  try{
+    overlay.muted = false;
+    overlay.volume = 0.8;
+    await overlay.play();
+    soundGate.style.display = "none";
+  }catch(e){
+    soundGate.style.display = "flex";
+  }
+}
+async function unlockAudio(){
+  try{
+    overlay.muted = false;
+    overlay.volume = 0.8;
+    await overlay.play();
+    soundGate.style.display = "none";
+  }catch(e){
+    soundGate.style.display = "flex";
+  }
+}
+soundBtn.addEventListener("click", unlockAudio);
+soundGate.addEventListener("click", unlockAudio);
+
+function stopOverlayImmediate(){
+  overlayWrap.style.display = "none";
+  try{ overlay.pause(); }catch(e){}
+  infoBadge.style.display = "none";
+}
+function playOverlay(){
+  overlayWrap.style.display = "block";
+  if(overlay.paused) overlay.play().catch(()=>{});
+}
+
+function showMatchIndicator(pairId){
+  matchIndicator.textContent = `Matched Pair #${pairId + 1}`;
+  matchIndicator.style.display = "block";
+  infoBadge.textContent = `Pair: ${pairId + 1}`;
+  infoBadge.style.display = "block";
+  setTimeout(() => { matchIndicator.style.display = "none"; }, 2000);
+}
+
+function centroid(pts){
+  let x=0,y=0; for(const p of pts){ x+=p.x; y+=p.y; }
+  return {x:x/pts.length, y:y/pts.length};
+}
+function sortAroundCenter(pts){
+  const c = centroid(pts);
+  return pts.slice().sort((a,b)=>{
+    const aa=Math.atan2(a.y-c.y,a.x-c.x);
+    const bb=Math.atan2(b.y-c.y,b.x-c.x);
+    return aa-bb;
+  });
+}
+function rotateToTL(pts){
+  let bestI=0, bestV=Infinity;
+  for(let i=0;i<4;i++){
+    const v = pts[i].x + pts[i].y;
+    if(v<bestV){ bestV=v; bestI=i; }
+  }
+  return pts.slice(bestI).concat(pts.slice(0,bestI));
+}
+function dist2(a,b){ const dx=a.x-b.x, dy=a.y-b.y; return dx*dx+dy*dy; }
+function rotateArray(arr,k){ return arr.slice(k).concat(arr.slice(0,k)); }
+function bestMatchToPrevious(ordered, prev){
+  let best=ordered, bestScore=Infinity;
+  for(let k=0;k<4;k++){
+    const cand = rotateArray(ordered,k);
+    let s=0; for(let i=0;i<4;i++) s += dist2(cand[i], prev[i]);
+    if(s<bestScore){ bestScore=s; best=cand; }
+  }
+  const rev = [ordered[0], ordered[3], ordered[2], ordered[1]];
+  for(let k=0;k<4;k++){
+    const cand = rotateArray(rev,k);
+    let s=0; for(let i=0;i<4;i++) s += dist2(cand[i], prev[i]);
+    if(s<bestScore){ bestScore=s; best=cand; }
+  }
+  return best;
+}
+
+function frameToElement(x, y, fw, fh){
+  const elW = wrap.clientWidth;
+  const elH = wrap.clientHeight;
+
+  const s = Math.max(elW/fw, elH/fh);
+  const dispW = fw*s, dispH = fh*s;
+  const offX = (elW - dispW)/2;
+  const offY = (elH - dispH)/2;
+
+  return { x: x*s + offX, y: y*s + offY };
+}
+
+function quadToMatrix3d(x1,y1,x2,y2,x3,y3,x4,y4, w, h){
+  const dx1 = x2 - x3, dy1 = y2 - y3;
+  const dx2 = x4 - x3, dy2 = y4 - y3;
+  const dx3 = x1 - x2 + x3 - x4;
+  const dy3 = y1 - y2 + y3 - y4;
+
+  let a13 = 0, a23 = 0;
+  if (dx3 !== 0 || dy3 !== 0) {
+    const det = dx1 * dy2 - dx2 * dy1;
+    a13 = (dx3 * dy2 - dx2 * dy3) / det;
+    a23 = (dx1 * dy3 - dx3 * dy1) / det;
+  }
+
+  const a11 = x2 - x1 + a13 * x2;
+  const a21 = x4 - x1 + a23 * x4;
+  const a31 = x1;
+
+  const a12 = y2 - y1 + a13 * y2;
+  const a22 = y4 - y1 + a23 * y4;
+  const a32 = y1;
+
+  return [
+    a11 / w, a12 / w, 0, a13 / w,
+    a21 / h, a22 / h, 0, a23 / h,
+    0,       0,       1, 0,
+    a31,     a32,     0, 1
+  ];
+}
+
+function applyWarp(cornersFrame){
+  let pts = cornersFrame.map(p => frameToElement(p.x, p.y, frameW, frameH));
+
+  pts = sortAroundCenter(pts);
+  pts = rotateToTL(pts);
+  if(lastOrdered) pts = bestMatchToPrevious(pts, lastOrdered);
+  lastOrdered = pts;
+
+  if(!smoothCorners) smoothCorners = pts;
+  else{
+    smoothCorners = pts.map((p,i)=>({
+      x: smoothCorners[i].x*SMOOTH + p.x*(1-SMOOTH),
+      y: smoothCorners[i].y*SMOOTH + p.y*(1-SMOOTH),
+    }));
+  }
+
+  const elW = wrap.clientWidth;
+  const elH = wrap.clientHeight;
+  const [p1,p2,p3,p4] = smoothCorners;
+
+  const m = quadToMatrix3d(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,p4.x,p4.y, elW, elH);
+  overlayWrap.style.transform = `matrix3d(${m.join(",")})`;
+}
+
+function matFromVideoGray(){
+  ctx.drawImage(cam, 0, 0, cap.width, cap.height);
+  const imgData = ctx.getImageData(0, 0, cap.width, cap.height);
+
+  let src = cv.matFromImageData(imgData);
+  let gray = new cv.Mat();
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+  src.delete();
+  return gray;
+}
+
+function cornersToMat(corners){
+  const data = [];
+  for(const p of corners){ data.push(p.x, p.y); }
+  return cv.matFromArray(4, 1, cv.CV_32FC2, data);
+}
+function matToCorners(mat){
+  const arr = [];
+  for(let i=0;i<4;i++){
+    arr.push({ x: mat.data32F[i*2], y: mat.data32F[i*2+1] });
+  }
+  return arr;
+}
+
+function trackFrame(){
+  requestAnimationFrame(trackFrame);
+  if(!cvReady || !tracking) return;
+
+  const gray = matFromVideoGray();
+
+  const nextPts = new cv.Mat();
+  const status = new cv.Mat();
+  const err = new cv.Mat();
+
+  cv.calcOpticalFlowPyrLK(prevGray, gray, prevPts, nextPts, status, err, new cv.Size(21,21), 3);
+
+  const goodPrev = [];
+  const goodNext = [];
+  const st = status.data;
+  const e  = err.data32F;
+
+  for(let i=0;i<st.length;i++){
+    if(st[i] === 1 && e[i] < MAX_ERR){
+      goodPrev.push(prevPts.data32F[i*2], prevPts.data32F[i*2+1]);
+      goodNext.push(nextPts.data32F[i*2], nextPts.data32F[i*2+1]);
+    }
+  }
+
+  if((goodPrev.length/2) < MIN_GOOD_POINTS){
+    tracking = false;
+    lastOrdered = null;
+    smoothCorners = null;
+    stopOverlayImmediate();
+    statusDiv.textContent = "Scanning…";
+    statusDiv.className = "status scan";
+
+    prevGray.delete(); prevGray = null;
+    prevPts.delete();  prevPts = null;
+
+    gray.delete();
+    nextPts.delete(); status.delete(); err.delete();
+    return;
+  }
+
+  const prevMat = cv.matFromArray(goodPrev.length/2, 1, cv.CV_32FC2, goodPrev);
+  const nextMat = cv.matFromArray(goodNext.length/2, 1, cv.CV_32FC2, goodNext);
+
+  const mask = new cv.Mat();
+  const H = cv.findHomography(prevMat, nextMat, cv.RANSAC, RANSAC_REPROJ, mask);
+
+  if(H.empty()){
+    tracking = false;
+    lastOrdered = null;
+    smoothCorners = null;
+    stopOverlayImmediate();
+    statusDiv.textContent = "Scanning…";
+    statusDiv.className = "status scan";
+  }else{
+    const cornerMat = cornersToMat(currCorners);
+    const newCornerMat = new cv.Mat();
+    cv.perspectiveTransform(cornerMat, newCornerMat, H);
+    currCorners = matToCorners(newCornerMat);
+
+    applyWarp(currCorners);
+    playOverlay();
+
+    prevGray.delete();
+    prevGray = gray;
+
+    prevPts.delete();
+    prevPts = nextMat.clone();
+
+    lastLockTs = performance.now();
+    statusDiv.textContent = "Tracking…";
+    statusDiv.className = "status track";
+
+    cornerMat.delete(); newCornerMat.delete();
+  }
+
+  nextPts.delete(); status.delete(); err.delete();
+  prevMat.delete(); nextMat.delete();
+  mask.delete(); H.delete();
+}
+
+async function detectOnceFromServer(){
+  if(detectInFlight || !cvReady || cam.readyState < 2) return;
+  detectInFlight = true;
+  loadingSpinner.style.display = "block";
+
+  cap.width = DETECT_W;
+  cap.height = Math.round(cam.videoHeight * (DETECT_W / cam.videoWidth));
+  frameW = cap.width;
+  frameH = cap.height;
+
+  ctx.drawImage(cam, 0, 0, cap.width, cap.height);
+  const blob = await new Promise(res => cap.toBlob(res, "image/jpeg", 0.72));
+
+  try{
+    const fd = new FormData();
+    fd.append("project_id", PROJECT_ID);
+    fd.append("test_image", blob, "frame.jpg");
+    
+    // ✅ Keep existing detection logic unchanged
+    const r = await fetch("/detect_init", { method:"POST", body: fd });
+    const data = await r.json();
+
+    // ✅ Your existing detection logic continues unchanged
+    if(!data.detected){
+      if(!tracking){
+        stopOverlayImmediate();
+        statusDiv.textContent = "Scanning…";
+        statusDiv.className = "status scan";
+      }
+      return;
+    }
+
+    const newVideoUrl = data.video_url;
+    const newPairId = data.matched_pair_id || 0;
+
+    const isSame = (currentVideoUrl === newVideoUrl && currentPairId === newPairId);
+
+    if(!isSame){
+      overlay.src = newVideoUrl;
+      overlay.currentTime = 0;
+      videoFinished = false;
+      currentVideoUrl = newVideoUrl;
+      currentPairId = newPairId;
+      showMatchIndicator(newPairId);
+      tryAutoEnableAudio();
+    } else {
+      if(videoFinished){
+        overlay.currentTime = 0;
+        videoFinished = false;
+        tryAutoEnableAudio();
+      } else {
+        playOverlay();
+      }
+    }
+
+    frameW = Number(data.frame_width);
+    frameH = Number(data.frame_height);
+    cap.width = frameW;
+    cap.height = frameH;
+
+    currCorners = data.corners.map(p => ({x:Number(p.x), y:Number(p.y)}));
+    const pts = (data.init_points || []).map(p => [Number(p.x), Number(p.y)]);
+
+    if(prevPts) prevPts.delete();
+    if(prevGray) prevGray.delete();
+
+    prevGray = matFromVideoGray();
+
+    if(pts.length >= 25){
+      const flat = [];
+      for(const [x,y] of pts) flat.push(x,y);
+      prevPts = cv.matFromArray(pts.length, 1, cv.CV_32FC2, flat);
+    }else{
+      const c = currCorners;
+      const flat = [];
+      for(let i=0;i<120;i++){
+        const t = i/120;
+        flat.push(c[0].x*(1-t)+c[2].x*t, c[0].y*(1-t)+c[2].y*t);
+      }
+      prevPts = cv.matFromArray(flat.length/2, 1, cv.CV_32FC2, flat);
+    }
+
+    tracking = true;
+    lastOrdered = null;
+    smoothCorners = null;
+    lastLockTs = performance.now();
+
+    applyWarp(currCorners);
+    playOverlay();
+
+    statusDiv.textContent = `Tracking Pair #${newPairId + 1}…`;
+    statusDiv.className = "status track";
+
+  }catch(e){
+    console.error("Detection error:", e);
+    statusDiv.textContent = "Error detecting";
+    statusDiv.className = "status scan";
+  }finally{
+    detectInFlight = false;
+    loadingSpinner.style.display = "none";
+  }
+}
+
+function startDetectLoop(){
+  setInterval(()=>{
+    const driftMs = performance.now() - lastLockTs;
+    if(!tracking || driftMs > 1200){
+      detectOnceFromServer();
+    }
+  }, DETECT_INTERVAL_MS);
+}
+
+navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }, audio:false })
+.then(stream=>{
+  cam.srcObject = stream;
+  cam.onloadedmetadata = async ()=>{
+    await cam.play();
+    requestAnimationFrame(()=>{
+      const r = cam.getBoundingClientRect();
+      wrap.style.height = r.height + "px";
+      overlayWrap.style.height = r.height + "px";
+    });
+    tryAutoEnableAudio();
+    statusDiv.textContent = "Waiting for OpenCV…";
+    statusDiv.className = "status scan";
+  };
+})
+.catch(err=>{
+  statusDiv.textContent = "Camera error: " + err;
+  statusDiv.className = "status scan";
+});
+
+window.Module.onRuntimeInitialized = ()=>{
+  cvReady = true;
+  statusDiv.textContent = "Scanning… Point camera at an image";
+  statusDiv.className = "status scan";
+  startDetectLoop();
+  requestAnimationFrame(trackFrame);
+};
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (overlay) overlay.pause();
+  } else {
+    if (tracking && overlay) overlay.play().catch(() => {});
+  }
+});
+</script>
+
+</body>
+</html>

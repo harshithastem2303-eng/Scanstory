@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Management - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+        }
+
+        .navbar {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            color: white;
+            padding: 0 20px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            display: none;
+            overflow: hidden;
+            z-index: 1001;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: #334155;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            bottom: 0;
+            width: 250px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 999;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-link:hover {
+            background: #f1f5f9;
+            color: #4f46e5;
+        }
+
+        .sidebar-link.active {
+            background: #e0e7ff;
+            color: #4f46e5;
+            border-left-color: #4f46e5;
+        }
+
+        .sidebar-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            margin-top: 70px;
+            padding: 30px;
+            min-height: calc(100vh - 70px);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-info {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #0284c7;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .filter-card {
+            margin-bottom: 20px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f8fafc;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .status-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .status-tab:hover {
+            background: #e2e8f0;
+        }
+
+        .status-tab.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4f46e5;
+            border-radius: 3px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar .sidebar-title,
+            .sidebar .sidebar-link span {
+                display: none;
+            }
+
+            .sidebar-link {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .status-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/admin/dashboard" class="navbar-brand">
+            <span>ScanStory Admin</span>
+        </a>
+
+        <div class="navbar-menu">
+            <span class="nav-link">Welcome, {{ admin.name }}</span>
+        </div>
+
+        <div class="user-menu">
+            <div class="user-avatar">
+                {{ admin.name[0] if admin.name else 'A' }}
+            </div>
+            <div class="dropdown-menu" id="userDropdown">
+                <a href="/admin/dashboard" class="dropdown-item">Dashboard</a>
+                <a href="/admin/settings" class="dropdown-item">Settings</a>
+                <div class="dropdown-divider"></div>
+                <a href="/admin/logout" class="dropdown-item">Logout</a>
+            </div>
+            <span onclick="toggleDropdown()" style="cursor: pointer;">▼</span>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">Dashboard</div>
+            <a href="/admin/dashboard" class="sidebar-link">
+                <i>📊</i>
+                <span>Overview</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">User Management</div>
+            <a href="/admin/users" class="sidebar-link">
+                <i>👥</i>
+                <span>Users</span>
+            </a>
+            <a href="/admin/subscriptions" class="sidebar-link active">
+                <i>💰</i>
+                <span>Subscriptions</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Content</div>
+            <a href="/admin/projects" class="sidebar-link">
+                <i>📁</i>
+                <span>Projects</span>
+            </a>
+            <a href="/admin/scans" class="sidebar-link">
+                <i>🔍</i>
+                <span>Scan Usage</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">System</div>
+            <a href="/admin/plans" class="sidebar-link">
+                <i>📋</i>
+                <span>Plans</span>
+            </a>
+            <a href="/admin/payments" class="sidebar-link">
+                <i>💳</i>
+                <span>Payments</span>
+            </a>
+            {% if admin.role == 'superadmin' %}
+            <a href="/admin/admins" class="sidebar-link">
+                <i>🛡️</i>
+                <span>Admins</span>
+            </a>
+            {% endif %}
+            <a href="/admin/settings" class="sidebar-link">
+                <i>⚙️</i>
+                <span>Settings</span>
+            </a>
+            <a href="/admin/activity-logs" class="sidebar-link">
+                <i>📝</i>
+                <span>Activity Logs</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Subscription Management</h1>
+            <div>
+                Total: {{ subscriptions|length }} |
+                Active: {{ subscriptions|selectattr('expiry_status', 'equalto', 'active')|list|length }} |
+                Expired: {{ subscriptions|selectattr('expiry_status', 'equalto', 'expired')|list|length }}
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Status Tabs -->
+        <div class="status-tabs">
+            <a href="/admin/subscriptions" class="status-tab {% if status == 'all' %}active{% endif %}">All
+                Subscriptions</a>
+            <a href="/admin/subscriptions?status=active"
+                class="status-tab {% if status == 'active' %}active{% endif %}">Active</a>
+            <a href="/admin/subscriptions?status=expired"
+                class="status-tab {% if status == 'expired' %}active{% endif %}">Expired</a>
+        </div>
+
+        <!-- Filters -->
+        <div class="card filter-card">
+            <form method="GET" action="/admin/subscriptions" class="filter-form">
+                <div class="form-group">
+                    <label for="search">Search</label>
+                    <input type="text" id="search" name="search" class="form-control"
+                        placeholder="Search by user email or name" value="{{ search }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="plan_id">Plan</label>
+                    <select id="plan_id" name="plan_id" class="form-control">
+                        <option value="">All Plans</option>
+                        {% for plan in plans %}
+                        <option value="{{ plan.id }}" {% if selected_plan_id==plan.id %}selected{% endif %}>
+                            {{ plan.plan_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="height: 42px;">Apply Filters</button>
+                    <a href="/admin/subscriptions" class="btn btn-secondary" style="height: 42px;">Clear</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Subscriptions Table -->
+        <div class="card">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Plan</th>
+                            <th>Amount</th>
+                            <th>Period</th>
+                            <th>Usage</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in subscriptions %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="user-avatar-small">
+                                        {{ sub.user.first_name[0] if sub.user and sub.user.first_name else
+                                        sub.user.email[0]|upper if sub.user else '?' }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ sub.user.full_name if sub.user else 'User Not Found' }}</strong><br>
+                                        <small style="color: #6b7280;">{{ sub.user.email if sub.user else 'N/A'
+                                            }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ sub.plan.plan_name if sub.plan else 'N/A' }}</strong><br>
+                                <small style="color: #6b7280;">Order: {{ sub.order_id[:8] }}...</small>
+                            </td>
+                            <td>
+                                ₹{{ "%.2f"|format(sub.total_amount) }}<br>
+                                <small style="color: #6b7280;">Paid on {{ sub.payment_at.strftime('%d %b') if
+                                    sub.payment_at else '' }}</small>
+                            </td>
+                            <td>
+                                {% if sub.subscription_start %}
+                                {{ sub.subscription_start.strftime('%d %b %Y') }}<br>
+                                <small style="color: #6b7280;">to {{ sub.subscription_end.strftime('%d %b %Y') if
+                                    sub.subscription_end else 'Never' }}</small>
+                                {% else %}
+                                <span style="color: #6b7280;">Not set</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>Projects: {{ sub.remaining_projects }}/{{ sub.purchased_project_limit }}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="width: {{ ((sub.purchased_project_limit - sub.remaining_projects) / sub.purchased_project_limit * 100) if sub.purchased_project_limit > 0 else 0 }}%">
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 8px;">Scans: {{ sub.remaining_scans }}/{{
+                                    sub.purchased_scan_limit }}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"
+                                        style="width: {{ ((sub.purchased_scan_limit - sub.remaining_scans) / sub.purchased_scan_limit * 100) if sub.purchased_scan_limit > 0 else 0 }}%">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if sub.expiry_status == 'active' %}
+                                <span class="badge badge-success">Active</span><br>
+                                <small style="color: #6b7280;">
+                                    {% if sub.subscription_end %}
+                                    <span class="days-left" data-expiry="{{ sub.subscription_end.isoformat() }}">
+                                        Calculating...
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">No expiry</span>
+                                    {% endif %}
+                                </small>
+                                {% else %}
+                                <span class="badge badge-danger">Expired</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm"
+                                        onclick="openExtendModal('{{ sub.id }}')">Extend</button>
+                                    <button class="btn btn-warning btn-sm"
+                                        onclick="openLimitsModal('{{ sub.id }}')">Add
+                                        Limits</button>
+                                    <form action="{{ url_for('admin_deactivate_subscription', order_id=sub.id) }}" method="POST"
+                                        style="display: inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Deactivate this subscription?')">Deactivate</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">
+                                No subscriptions found
+                                {% if search or status != 'all' or selected_plan_id %}
+                                with current filters. <a href="/admin/subscriptions">Clear filters</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Subscription Statistics -->
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">Subscription Statistics</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #4f46e5;">{{ subscriptions|length }}</div>
+                    <div style="color: #6b7280;">Total Subscriptions</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #10b981;">{{
+                        subscriptions|selectattr('expiry_status', 'equalto', 'active')|list|length }}</div>
+                    <div style="color: #6b7280;">Active</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #f59e0b;">₹{{
+                        "%.0f"|format(subscriptions|sum(attribute='total_amount')|default(0)) }}</div>
+                    <div style="color: #6b7280;">Total Revenue</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold; color: #8b5cf6;">
+                        {{ (subscriptions|sum(attribute='purchased_project_limit')|default(0)) -
+                        (subscriptions|sum(attribute='remaining_projects')|default(0)) }}
+                    </div>
+                    <div style="color: #6b7280;">Projects Used</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend Subscription Modal -->
+    <div class="modal" id="extendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Extend Subscription</h3>
+                <button class="modal-close" onclick="closeModal('extendModal')">&times;</button>
+            </div>
+            <form id="extendForm" method="POST" action="">
+                <div class="form-group">
+                    <label for="extension_months">Extension Months</label>
+                    <input type="number" id="extension_months" name="extension_months" class="form-control"
+                        placeholder="Enter number of months" min="1" max="36" value="1" required>
+                    <div class="help-text">Add months to the current subscription end date</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Extend Subscription</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('extendModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Increase Limits Modal -->
+    <div class="modal" id="limitsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Increase Subscription Limits</h3>
+                <button class="modal-close" onclick="closeModal('limitsModal')">&times;</button>
+            </div>
+            <form id="limitsForm" method="POST" action="">
+                <div class="form-group">
+                    <label for="additional_projects">Additional Projects</label>
+                    <input type="number" id="additional_projects" name="additional_projects" class="form-control"
+                        placeholder="Enter number of projects" min="0" value="0">
+                    <div class="help-text">Add to project limit (0 for no change)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_scans">Additional Scans</label>
+                    <input type="number" id="additional_scans" name="additional_scans" class="form-control"
+                        placeholder="Enter number of scans" min="0" value="0">
+                    <div class="help-text">Add to scan limit (0 for no change)</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Increase Limits</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('limitsModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function (event) {
+            if (!event.target.matches('.user-menu span')) {
+                const dropdowns = document.querySelectorAll('.dropdown-menu');
+                dropdowns.forEach(dropdown => {
+                    if (dropdown.classList.contains('show')) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+            }
+        };
+
+        // Modal functions
+        let currentSubscriptionId = null;
+
+        function openExtendModal(subscriptionId) {
+            currentSubscriptionId = subscriptionId;
+            document.getElementById('extendForm').action = `/admin/subscriptions/${subscriptionId}/extend`;
+            document.getElementById('extendModal').classList.add('show');
+        }
+
+        function openLimitsModal(subscriptionId) {
+            currentSubscriptionId = subscriptionId;
+            document.getElementById('limitsForm').action = `/admin/subscriptions/${subscriptionId}/increase-limits`;
+            document.getElementById('limitsModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            currentSubscriptionId = null;
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function (event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('show');
+                    currentSubscriptionId = null;
+                }
+            });
+        });
+
+        // Auto remove alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+
+            // Validate at least one field is filled in limits form
+            const limitsForm = document.getElementById('limitsForm');
+            if (limitsForm) {
+                limitsForm.addEventListener('submit', function (e) {
+                    const projects = document.getElementById('additional_projects').value;
+                    const scans = document.getElementById('additional_scans').value;
+
+                    if (projects == 0 && scans == 0) {
+                        e.preventDefault();
+                        alert('Please enter at least one positive value for projects or scans.');
+                    }
+                });
+            }
+        });
+
+        // Calculate days left for all subscriptions
+        document.addEventListener('DOMContentLoaded', function () {
+            const now = new Date();
+
+            document.querySelectorAll('.days-left').forEach(function (element) {
+                const expiryDate = new Date(element.dataset.expiry);
+                const timeDiff = expiryDate - now;
+                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+                if (daysLeft > 30) {
+                    element.textContent = daysLeft + ' days left';
+                    element.style.color = '#10b981';
+                } else if (daysLeft > 7) {
+                    element.textContent = daysLeft + ' days left';
+                    element.style.color = '#f59e0b';
+                } else if (daysLeft > 0) {
+                    element.textContent = daysLeft + ' days left';
+                    element.style.color = '#ef4444';
+                } else if (daysLeft === 0) {
+                    element.textContent = 'Expires today';
+                    element.style.color = '#ef4444';
+                } else {
+                    element.textContent = 'Expired ' + Math.abs(daysLeft) + ' days ago';
+                    element.style.color = '#6b7280';
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

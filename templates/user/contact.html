@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Support | SCANSTORY</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary: #ff007a;
+            --secondary: #7000ff;
+            --accent: #00d4ff;
+            --bg-dark: #050505;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animated background blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.25;
+            animation: blobMove 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes blobMove {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(120px, 100px) scale(1.3);
+            }
+        }
+
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--secondary);
+            top: -10%;
+            left: -5%;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            bottom: -10%;
+            right: -5%;
+        }
+
+        /* Glass morphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s ease;
+        }
+
+        .glass:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Navigation */
+        .nav-logo {
+            width: 120px;
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+        }
+
+        /* Back button - UPDATED with better styling */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 8px 25px rgba(255, 0, 122, 0.5);
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+        }
+
+        .back-btn i {
+            font-size: 12px;
+        }
+
+        /* Form styles - IMPROVED */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-label i {
+            color: var(--primary);
+            font-size: 18px;
+            margin-right: 10px;
+            filter: drop-shadow(0 2px 4px rgba(255, 0, 122, 0.3));
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(25, 25, 35, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background: rgba(35, 35, 45, 1);
+            box-shadow: 0 0 0 4px rgba(255, 0, 122, 0.25), 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 15px;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .form-input:not(:placeholder-shown) {
+            background: rgba(40, 40, 55, 1);
+            border-color: rgba(255, 0, 122, 0.5);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        textarea.form-input {
+            min-height: 140px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 16px;
+            padding: 18px 32px;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(255, 0, 122, 0.3);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(255, 0, 122, 0.5);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Toast messages */
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            max-width: 350px;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-left: 4px solid;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%) scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-left-color: #34d399;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-left-color: #f87171;
+        }
+
+        /* Contact info cards */
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 24px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(255, 0, 122, 0.2);
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, rgba(255, 0, 122, 0.15), rgba(0, 212, 255, 0.15));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover .info-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .contact-link {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 18px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .contact-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+
+        .contact-link:hover {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .contact-link:hover::after {
+            width: 100%;
+        }
+
+        /* Loading spinner */
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .nav-logo {
+                width: 100px;
+                height: 60px;
+            }
+
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 32px !important;
+            }
+
+            .info-card {
+                padding: 20px;
+            }
+
+            .form-input {
+                padding: 14px 18px;
+            }
+
+            .submit-btn {
+                padding: 16px 24px;
+                font-size: 14px;
+            }
+
+            .toast-message {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Toast container -->
+    <div id="toastContainer"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full glass px-4 md:px-8 py-4 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="transition-transform hover:scale-105">
+                <img src="{{ url_for('static', filename='uploads/logos/logo1.png') }}" class="nav-logo" alt="Logo">
+            </a>
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="pt-32 pb-16 px-4 md:px-6 max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12 md:mb-16" data-aos="fade-up">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4">
+                Contact <span class="text-pink-500">Support</span>
+            </h1>
+            <p class="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+                Have questions? Fill the form below and we will get back to you within 24 hours.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            <!-- Contact info cards -->
+            <div class="lg:col-span-1 space-y-4 md:space-y-6" data-aos="fade-right">
+                <!-- Phone -->
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Phone</h3>
+                    <p class="text-slate-400 text-sm mb-3">Call us directly</p>
+                    <a href="tel:+917338544142" class="contact-link text-xl">
+                        +91 73385 44142
+                    </a>
+                </div>
+
+                <!-- Email -->
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Email</h3>
+                    <p class="text-slate-400 text-sm mb-3">Send us an email</p>
+                    <a href="mailto:scanstory.service@gmail.com" class="contact-link text-lg break-all">
+                        scanstory.service@gmail.com
+                    </a>
+                </div>
+
+                <!-- Response Time -->
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Response Time</h3>
+                    <p class="text-slate-400 text-sm">
+                        We aim to respond within <span class="text-pink-500 font-bold">24 hours</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contact form -->
+            <div class="lg:col-span-2" data-aos="fade-left">
+                <div class="glass p-6 md:p-8 lg:p-10 rounded-3xl">
+                    <form id="contactForm">
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i> Your Name
+                            </label>
+                            <input type="text" id="name" name="name" class="form-input" 
+                                placeholder="Enter Your Name" required>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i> Contact Number
+                            </label>
+                            <input type="tel" id="phone" name="phone" class="form-input"
+                                placeholder="Enter 10 digit phone number" pattern="[0-9]{10}" 
+                                maxlength="10" required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <input type="email" id="email" name="email" class="form-input"
+                                placeholder="name@example.com" required>
+                        </div>
+
+                        <!-- Project -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-project-diagram"></i> Project Name
+                            </label>
+                            <input type="text" id="project" name="project" class="form-input"
+                                placeholder="Your Project Name (Optional)">
+                        </div>
+
+                        <!-- Message -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-comment"></i> Your Query
+                            </label>
+                            <textarea id="message" name="message" rows="5" class="form-input"
+                                placeholder="Describe your issue in detail..." required></textarea>
+                        </div>
+
+                        <!-- Submit button -->
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fas fa-paper-plane mr-2"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security notice -->
+        <div class="mt-8 md:mt-12 text-center" data-aos="fade-up">
+            <p class="text-slate-500 text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                <i class="fas fa-shield-alt text-pink-500"></i>
+                Your information is secure and will only be used to respond to your inquiry
+            </p>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            disable: 'mobile'
+        });
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${type}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
+                    <div>
+                        <div class="font-bold mb-1">${type === 'success' ? 'Success!' : 'Error!'}</div>
+                        <div class="text-sm">${message}</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Phone number validation - only digits
+        document.getElementById('phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+        });
+
+        // Form submission handler - STAYS ON SAME PAGE
+        document.getElementById("contactForm").addEventListener("submit", async function(e) {
+            e.preventDefault(); // 🛑 CRITICAL: Prevents page reload/navigation
+
+            // Get values
+            const email = document.getElementById("email").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            
+            // Validation patterns
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phonePattern = /^[0-9]{10}$/;
+
+            // Validate email
+            if (!emailPattern.test(email)) {
+                showToast("Please enter a valid email address", "error");
+                return;
+            }
+
+            // Validate phone
+            if (!phonePattern.test(phone)) {
+                showToast("Please enter a valid 10 digit phone number", "error");
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById("submitBtn");
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+            submitBtn.disabled = true;
+
+            try {
+                // Send data using fetch (no page reload)
+                const formData = new FormData(this);
+                const response = await fetch('/send-contact-email', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // ✅ Show success message
+                    showToast("Thank you for contacting us. We will reach out soon.", "success");
+                    this.reset(); // Clear form
+                } else {
+                    // ❌ Show error message
+                    showToast(result.error || "Failed to send message. Please try again.", "error");
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast("Network error. Please check your connection.", "error");
+            } finally {
+                // Restore button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

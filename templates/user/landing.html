@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScanStory - AR Experience Platform | Create Interactive AR Content</title>
+    <meta name="title" content="ScanStory - AR Experience Platform | Create Interactive AR Content">
+    <meta name="description"
+        content="Create augmented reality experiences instantly. Upload images, generate QR codes, and let customers scan to view AR content. Perfect for businesses, agencies, and creators.">
+    <meta name="keywords"
+        content="AR, Augmented Reality, QR Code, ScanStory, myscanstory, AR Platform, Image Recognition, AR Experience">
+    <meta name="author" content="ScanStory">
+    <meta name="robots" content="index, follow">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://myscanstory.com">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://myscanstory.com">
+    <meta property="og:title" content="ScanStory - AR Experience Platform">
+    <meta property="og:description"
+        content="Create augmented reality experiences instantly. Upload images, generate QR codes, and let customers scan to view AR content.">
+    <meta property="og:image" content="https://myscanstory.com/static/uploads/logos/logo1.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='uploads/logos/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='uploads/logos/logo.png') }}">
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary: #ff007a;
+            --secondary: #7000ff;
+            --accent: #00d4ff;
+            --bg-dark: #050505;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .navbar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            padding: 0 1.5rem;
+        }
+
+        .center-menu {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-logo {
+            width: 140px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.15;
+            transition: transform 0.2s ease-out;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .glass:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .animated-gradient-text {
+            background: linear-gradient(to right, #fff, var(--accent), var(--primary), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textFlow 5s linear infinite;
+        }
+
+        @keyframes textFlow {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .glow-btn {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glow-btn:hover {
+            box-shadow: 0 0 50px rgba(255, 0, 122, 0.5);
+            transform: scale(1.05);
+            background: #fff;
+            color: #000;
+        }
+
+        /* Number cards styling */
+        .number-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .number-card:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .number-zoom {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 8rem;
+            color: rgba(255, 255, 255, 0.03);
+            position: absolute;
+            top: -2rem;
+            left: 1.5rem;
+            line-height: 1;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .number-card:hover .number-zoom {
+            transform: scale(1.2);
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 9rem;
+            top: -3rem;
+            left: 1rem;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            transition: all 0.4s ease;
+        }
+
+        .number-card:hover .card-content {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+
+        .number-card:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+            opacity: 1;
+        }
+
+        .number-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 3rem;
+            padding: 2px;
+            background: linear-gradient(45deg,
+                    rgba(255, 0, 122, 0) 0%,
+                    rgba(0, 212, 255, 0) 25%,
+                    rgba(112, 0, 255, 0) 50%,
+                    rgba(255, 0, 122, 0) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+
+        .number-card:hover::before {
+            opacity: 1;
+            background: linear-gradient(45deg,
+                    var(--primary) 0%,
+                    var(--accent) 25%,
+                    var(--secondary) 50%,
+                    var(--primary) 100%);
+            background-size: 300% 300%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .number-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center,
+                    rgba(255, 0, 122, 0.1) 0%,
+                    rgba(0, 212, 255, 0.05) 30%,
+                    transparent 70%);
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+            border-radius: 3rem;
+        }
+
+        .number-card:hover::after {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .scan-line-decor {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            opacity: 0.3;
+        }
+
+        .footer-logo {
+            height: 120px;
+            width: 80px;
+        }
+
+        .footer-link {
+            transition: all 0.3s ease;
+            color: #94a3b8;
+        }
+
+        .footer-link:hover {
+            color: #ff007a;
+            padding-left: 8px;
+        }
+
+        .social-icon {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-icon:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 0, 122, 0.3);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            transform: translateY(-100%);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .menu-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu.active .menu-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Section spacing */
+        section {
+            scroll-margin-top: 70px;
+        }
+
+        /* Hero section - FULL SCREEN */
+        #hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Move hero content down on mobile only */
+        #hero-section>div {
+            transform: translateY(-1rem);
+        }
+
+        /* Video section - touching hero on mobile */
+        #demo-video-section {
+            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Other sections - reduced padding */
+        .section-padding {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+
+        @media (min-width: 769px) {
+
+            /* Desktop - reset mobile adjustments */
+            #hero-section>div {
+                transform: translateY(0);
+            }
+
+            #demo-video-section {
+                margin-top: 0;
+                padding-top: 2rem;
+                padding-bottom: 4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #hero-section>div {
+                transform: translateY(-2rem);
+            }
+
+            #demo-video-section {
+                margin-top: -4rem;
+                padding-bottom: 3rem;
+            }
+
+            h1 {
+                font-size: clamp(2.8rem, 12vw, 5rem) !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #hero-section>div {
+                transform: translateY(-1.5rem);
+            }
+
+            #demo-video-section {
+                margin-top: -3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Blobs -->
+    <div id="blob1" class="blob w-96 h-96 bg-purple-600 top-[-10%] left-[-5%]"></div>
+    <div id="blob2" class="blob w-[500px] h-[500px] bg-pink-600 bottom-[-10%] right-[-5%]"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar fixed top-0 w-full z-[100] glass border-none px-4 md:px-8">
+        <!-- Logo -->
+        <div>
+            <img src="{{ url_for('static', filename='uploads/logos/logo1.png') }}" class="nav-logo" alt="Logo">
+        </div>
+
+        <!-- Desktop Center Menu -->
+        <div class="center-menu hidden lg:flex space-x-12 text-[10px] font-bold uppercase tracking-[0.3em]">
+            <a href="#about" class="hover:text-cyan-400 transition-all">Technology</a>
+            <a href="#how-it-works" class="hover:text-pink-500 transition-all">How it Works</a>
+            
+            
+        </div>
+
+        <!-- Desktop Auth + Mobile Hamburger -->
+        <div class="flex items-center gap-6 md:gap-8">
+            <!-- Desktop Login/Register -->
+            <div class="hidden lg:flex items-center gap-8">
+                <a href="/login/"
+                    class="text-[10px] font-bold uppercase tracking-[0.3em] hover:text-pink-500 transition-all">
+                    Login
+                </a>
+                <a href="/register/"
+                    class="glow-btn px-8 py-3 rounded-full border border-white/10 text-xs font-bold uppercase tracking-widest bg-white/5">
+                    Register
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="menu-toggle" class="lg:hidden text-2xl z-50" type="button">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu flex flex-col justify-center items-center">
+        <button id="menu-close" class="absolute top-8 right-8 text-3xl" type="button">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <div class="flex flex-col items-center gap-10 text-2xl font-bold uppercase tracking-wider">
+            <a href="#about" class="menu-item hover:text-cyan-400 transition-colors">Technology</a>
+            <a href="#how-it-works" class="menu-item hover:text-pink-500 transition-colors">How it Works</a>
+            <a href="/templates/user/subscribe.html" class="menu-item hover:text-purple-400 transition-colors">Pricing</a>
+            <div class="h-px w-48 bg-white/20 my-4"></div>
+            <a href="/login/" class="menu-item text-xl hover:text-pink-500">Login</a>
+            <a href="/register/" class="menu-item glow-btn px-12 py-5 rounded-2xl bg-pink-600 mt-4">
+                Register
+            </a>
+        </div>
+    </div>
+
+    <!-- Hero Section - Content moved down on mobile only -->
+    <section id="hero-section" class="px-6 text-center">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-[clamp(2.8rem,10vw,7rem)] font-black leading-[0.9] uppercase mb-4" data-aos="zoom-in-up">
+                Beyond the <br> <span class="animated-gradient-text italic">Static Frame</span>
+            </h1>
+            <p class="max-w-2xl text-slate-500 text-base sm:text-lg font-light mb-6 mx-auto" data-aos="fade-up">
+                Propelling print media into the digital age with our enterprise-grade AR recognition engine.
+            </p>
+            <div class="flex gap-6 justify-center" data-aos="fade-up">
+                <a href="/register/"
+                    class="glow-btn bg-pink-600 px-8 py-3 sm:px-10 sm:py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl inline-block">
+                    Start with Free Trial
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Video Section -->
+    <section id="demo-video-section" class="flex justify-center px-4 sm:px-6 pb-16">
+        <div class="w-full max-w-[85vw] sm:max-w-[70vw] md:max-w-[60vw] relative" data-aos="zoom-out-up" data-tilt>
+
+            <div class="glass p-2 sm:p-3 rounded-[1.5rem] sm:rounded-[2rem] relative overflow-hidden">
+
+                <div class="bg-black rounded-[1rem] sm:rounded-[1.5rem] overflow-hidden border border-white/5 relative"
+                    style="aspect-ratio: 16/9;">
+
+                    <!-- Video Element -->
+                    <video controls playsinline class="w-full h-full object-contain"
+                        poster="{{ url_for('static', filename='uploads/logos/video-poster.jpg') }}"
+                        style="background:#000;">
+                        <source src="{{ url_for('static', filename='videos/demo.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- About / Technology -->
+    <section id="about" class="py-16 px-6 lg:px-20 relative overflow-hidden bg-[#080808]/50">
+        <div class="scan-line-decor top-0"></div>
+        <div class="flex flex-col lg:flex-row gap-12 items-start">
+            <div class="lg:w-1/4 lg:sticky lg:top-32" data-aos="fade-right">
+                <h2 class="text-4xl md:text-5xl font-black uppercase leading-none mb-4 italic">What is<br><span
+                        class="text-pink-500">ScanStory?</span></h2>
+                <div class="h-1 w-20 bg-gradient-to-r from-pink-500 to-transparent mb-4"></div>
+                <p class="text-slate-400 text-base font-light leading-relaxed">
+                    AR is a digital layer on reality, perfected by our engine to create fluid Web-AR experiences where
+                    video becomes a permanent, anchored memory.
+                </p>
+            </div>
+
+            <div class="lg:w-3/4 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Card 01 -->
+                <div class="glass p-6 md:p-8 rounded-[2rem] number-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="number-zoom">01</div>
+                    <div class="card-content">
+                        <div class="card-icon text-cyan-400">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <span class="text-cyan-400 font-black mb-4 block uppercase tracking-[0.2em] text-[10px]">
+                            INFRASTRUCTURE
+                        </span>
+                        <h3 class="card-title text-xl md:text-2xl font-bold mb-3">AR-Overlay</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed font-light">
+                            Advanced proprietary tracking that anchors digital assets to physical markers with
+                            sub-millimeter precision.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 02 -->
+                <div class="glass p-6 md:p-8 rounded-[2rem] number-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="number-zoom">02</div>
+                    <div class="card-content">
+                        <div class="card-icon text-purple-400">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <span class="text-purple-400 font-black mb-4 block uppercase tracking-[0.2em] text-[10px]">
+                            ACCESSIBILITY
+                        </span>
+                        <h3 class="card-title text-xl md:text-2xl font-bold mb-3">Web-Native</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed font-light">
+                            Zero barrier to entry. No app store downloads. Just a browser and a camera to unlock the
+                            experience.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 03 -->
+                <div class="glass p-6 md:p-8 rounded-[2rem] number-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="number-zoom">03</div>
+                    <div class="card-content">
+                        <div class="card-icon text-pink-400">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="text-pink-400 font-black mb-4 block uppercase tracking-[0.2em] text-[10px]">
+                            INTELLIGENCE
+                        </span>
+                        <h3 class="card-title text-xl md:text-2xl font-bold mb-3">Analytics</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed font-light">
+                            Deep-dive metrics into user engagement, geographical scans, and dwell time through a
+                            real-time
+                            data stream.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section id="how-it-works" class="py-16 px-6 md:px-10 relative overflow-hidden">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-black uppercase italic" data-aos="flip-up">Execution Workflow</h2>
+        </div>
+
+        <div class="space-y-12 md:space-y-20 max-w-7xl mx-auto">
+            <!-- Step 01 -->
+            <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                <div class="lg:w-1/2 order-2 lg:order-1" data-aos="fade-right">
+                    <h4 class="text-cyan-500 font-bold uppercase tracking-[0.3em] mb-2 text-xs">Step 01</h4>
+                    <h3 class="text-2xl md:text-3xl font-black mb-3 italic uppercase">ENTRY POINT</h3>
+                    <p class="text-slate-400 text-sm md:text-base font-light">
+                        Begin your creative journey by defining a unique name for your project.
+                    </p>
+                </div>
+                <div class="lg:w-1/2 glass p-3 rounded-[1.5rem] md:rounded-[2rem] order-1 lg:order-2"
+                    data-aos="zoom-in-left" data-tilt>
+                    <img src="static/uploads/logos/steeep1.png"
+                        class="rounded-[1rem] md:rounded-[1.5rem] opacity-60 w-full aspect-video object-cover"
+                        alt="Step 1">
+                </div>
+            </div>
+
+            <!-- Step 02 -->
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-12">
+                <div class="lg:w-1/2 order-2 lg:order-1" data-aos="fade-left">
+                    <h4 class="text-pink-500 font-bold uppercase tracking-[0.3em] mb-2 text-xs">Step 02</h4>
+                    <h3 class="text-2xl md:text-3xl font-black mb-3 italic uppercase">Digital Sync</h3>
+                    <p class="text-slate-400 text-sm md:text-base font-light">
+                        A streamlined interface for uploading and pairing images with video content.
+                    </p>
+                </div>
+                <div class="lg:w-1/2 glass p-3 rounded-[1.5rem] md:rounded-[2rem] order-1 lg:order-2"
+                    data-aos="zoom-in-right" data-tilt>
+                    <img src="static/uploads/logos/step2.png"
+                        class="rounded-[1rem] md:rounded-[1.5rem] opacity-60 w-full aspect-video object-cover"
+                        alt="Step 2">
+                </div>
+            </div>
+
+            <!-- Step 03 -->
+            <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                <div class="lg:w-1/2 order-2 lg:order-1" data-aos="fade-right">
+                    <h4 class="text-cyan-500 font-bold uppercase tracking-[0.3em] mb-2 text-xs">Step 03</h4>
+                    <h3 class="text-2xl md:text-3xl font-black mb-3 italic uppercase">Review Assets</h3>
+                    <p class="text-slate-400 text-sm md:text-base font-light">
+                        A functional dashboard for playing back videos and refining your selections.
+                    </p>
+                </div>
+                <div class="lg:w-1/2 glass p-3 rounded-[1.5rem] md:rounded-[2rem] order-1 lg:order-2"
+                    data-aos="zoom-in-left" data-tilt>
+                    <img src="static/uploads/logos/step3.png"
+                        class="rounded-[1rem] md:rounded-[1.5rem] opacity-60 w-full aspect-video object-cover"
+                        alt="Step 3">
+                </div>
+            </div>
+
+            <!-- Step 04 -->
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-12">
+                <div class="lg:w-1/2 order-2 lg:order-1" data-aos="fade-left">
+                    <h4 class="text-pink-500 font-bold uppercase tracking-[0.3em] mb-2 text-xs">Step 04</h4>
+                    <h3 class="text-2xl md:text-3xl font-black mb-3 italic uppercase">Instant Access</h3>
+                    <p class="text-slate-400 text-sm md:text-base font-light">
+                        A confirmation screen with scannable QR code for immediate project integration.
+                    </p>
+                </div>
+                <div class="lg:w-1/2 glass p-3 rounded-[1.5rem] md:rounded-[2rem] order-1 lg:order-2"
+                    data-aos="zoom-in-right" data-tilt>
+                    <img src="static/uploads/logos/step4.png"
+                        class="rounded-[1rem] md:rounded-[1.5rem] opacity-60 w-full aspect-video object-cover"
+                        alt="Step 4">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-12 pb-8 px-6 lg:px-20 relative overflow-hidden border-t border-white/5 glass">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12">
+            <div class="space-y-4">
+                <div class="text-2xl font-black italic tracking-tighter">
+                    <img src="{{ url_for('static', filename='uploads/logos/logo1.png') }}" alt="SCANSTORY"
+                        class="footer-logo brightness-200 mb-2">
+                </div>
+                <p class="text-slate-400 text-xs leading-relaxed max-w-xs">
+                    The world's most advanced browser-based AR engine.
+                </p>
+                <div class="flex gap-3">
+                    <a href="https://www.linkedin.com/company/m-pro9-pvt-ltd/" target="_blank" class="social-icon"><i
+                            class="fab fa-linkedin-in text-xs"></i></a>
+
+                    <a href="https://www.instagram.com/mpro9official/" target="_blank" class="social-icon"><i
+                            class="fab fa-instagram text-xs"></i></a>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-white font-black uppercase tracking-[0.2em] text-[10px]">Platform</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#demo-video-section" class="footer-link block">Live Demo</a></li>
+                    <li><a href="#about" class="footer-link block">What is ScanStory</a></li>
+                    <li><a href="#how-it-works" class="footer-link block">Experience Portal</a></li>
+                    
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-white font-black uppercase tracking-[0.2em] text-[10px]">Use Cases</h4>
+                <div class="space-y-3">
+                    <div class="border-l-2 border-pink-500/30 pl-3 group">
+                        <h5 class="text-white text-xs font-bold uppercase mb-1">Retail Branding</h5>
+                        <p class="text-slate-500 text-[10px]">Interactive packaging with AR.</p>
+                    </div>
+                    <div class="border-l-2 border-cyan-500/30 pl-3 group">
+                        <h5 class="text-white text-xs font-bold uppercase mb-1">Education</h5>
+                        <p class="text-slate-500 text-[10px]">Bring textbooks to life.</p>
+                    </div>
+                    <div class="border-l-2 border-purple-500/30 pl-3 group">
+                        <h5 class="text-white text-xs font-bold uppercase mb-1">Real Estate</h5>
+                        <p class="text-slate-500 text-[10px]">Immersive 4K video tours.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-white font-black uppercase tracking-[0.2em] text-[10px]">Resources</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="/contact" class="footer-link block">Contact Support</a></li>
+
+                    <li><a href="/terms" class="footer-link block">Terms of Service</a></li>
+                </ul>
+
+            </div>
+        </div>
+
+        <div class="pt-6 border-t border-white/5 text-center">
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-600">
+                © 2026 <span class="text-white/40 hover:text-pink-500 transition-colors">SCANSTORY</span>. All
+                Rights Reserved. Powered by MPRO9 Technologies
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true, mirror: false });
+
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            max: 3,
+            speed: 300,
+            glare: false
+        });
+
+        // Blob movement
+        window.addEventListener('scroll', () => {
+            const scroll = window.pageYOffset;
+            const b1 = document.getElementById('blob1');
+            const b2 = document.getElementById('blob2');
+            if (b1) b1.style.transform = `translate(${scroll * 0.03}px, ${scroll * 0.05}px)`;
+            if (b2) b2.style.transform = `translate(${scroll * -0.03}px, ${scroll * -0.05}px)`;
+        });
+
+        // Mobile Menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuToggle && menuClose && mobileMenu) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            menuClose.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const navbarHeight = 70;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+
+                    history.pushState(null, null, targetId);
+                }
+            });
+        });
+
+        // Video auto-play when visible (only on scroll)
+        document.addEventListener('DOMContentLoaded', function () {
+            const video = document.getElementById('demoVideo');
+            const demoSection = document.getElementById('demo-video-section');
+
+            if (!video || !demoSection) return;
+
+            // Ensure video starts paused
+            video.pause();
+
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+                // Video plays when at least 30% is visible
+                return rect.top < windowHeight - 100 && rect.bottom > 100;
+            }
+
+            function handleVideoPlayback() {
+                if (isInViewport(demoSection)) {
+                    // Play with audio when visible
+                    video.muted = false;
+                    video.play().catch(() => {
+                        // Fallback for browsers that block autoplay with audio
+                        video.muted = true;
+                        video.play();
+                    });
+                } else {
+                    // Pause when not visible
+                    video.pause();
+                }
+            }
+
+            // Check on scroll
+            window.addEventListener('scroll', handleVideoPlayback, { passive: true });
+
+            // Check once after load
+            setTimeout(handleVideoPlayback, 500);
+        });
+
+        // Video play/pause control with button overlay
+        const video = document.getElementById('demoVideo');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+
+        if (video && playPauseBtn && playPauseIcon) {
+
+            // Function to update button icon
+            function updateButtonIcon() {
+                if (video.paused) {
+                    playPauseIcon.classList.remove('fa-pause');
+                    playPauseIcon.classList.add('fa-play');
+                } else {
+                    playPauseIcon.classList.remove('fa-play');
+                    playPauseIcon.classList.add('fa-pause');
+                }
+            }
+
+            // Click on button toggles play/pause
+            playPauseBtn.addEventListener('click', function () {
+                if (video.paused) {
+                    video.play();
+                    // Video will start playing with audio (remove muted if you want sound)
+                    video.muted = false;
+                } else {
+                    video.pause();
+                }
+                updateButtonIcon();
+            });
+
+            // Update icon when video pauses/plays from other controls
+            video.addEventListener('play', updateButtonIcon);
+            video.addEventListener('pause', updateButtonIcon);
+
+            // Auto-play when visible (optional - keeps your existing scroll behavior)
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                return rect.top < windowHeight - 100 && rect.bottom > 100;
+            }
+
+            function handleVideoPlayback() {
+                if (isInViewport(document.getElementById('demo-video-section'))) {
+                    // Don't auto-play, just update button state
+                    updateButtonIcon();
+                } else {
+                    video.pause();
+                    updateButtonIcon();
+                }
+            }
+
+            window.addEventListener('scroll', handleVideoPlayback, { passive: true });
+            setTimeout(handleVideoPlayback, 500);
+        }
+    </script>
+</body>
+
+</html>

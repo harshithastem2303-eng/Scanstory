@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions | ScanStory AR</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Google Fonts - Elegant combination -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff007a;
+            --primary-dark: #cc0062;
+            --secondary: #7000ff;
+            --accent: #00d4ff;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.7);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0c0;
+            --text-muted: #808090;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --gradient-1: linear-gradient(135deg, #ff007a, #7000ff);
+            --gradient-2: linear-gradient(135deg, rgba(255, 0, 122, 0.1), rgba(112, 0, 255, 0.1));
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 40px rgba(255, 0, 122, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 20% 30%, rgba(112, 0, 255, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(255, 0, 122, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 40% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 40%);
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.02;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJmIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc0IiBudW1PY3RhdmVzPSIzIiAvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNmKSIgb3BhY2l0eT0iMC40IiAvPjwvc3ZnPg==');
+        }
+
+        /* Navbar styles matching landing page */
+        .navbar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            padding: 0 1.5rem;
+        }
+
+        .center-menu {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-logo {
+            width: 140px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .glow-btn {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glow-btn:hover {
+            box-shadow: 0 0 50px rgba(255, 0, 122, 0.5);
+            transform: scale(1.05);
+            background: #fff;
+            color: #000;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            transform: translateY(-100%);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .menu-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-menu.active .menu-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            padding: 0.6rem 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            background: rgba(255, 0, 122, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            padding: 0.6rem 1.8rem;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 0, 122, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+         /* Back button - UPDATED with better styling */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 8px 25px rgba(255, 0, 122, 0.5);
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+        }
+
+        .back-btn i {
+            font-size: 12px;
+        }
+
+        /* Header Section */
+        .terms-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .terms-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff, #ff007a, #7000ff, #ffffff);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 8s ease infinite;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .header-decoration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .decoration-line {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+        }
+
+        .decoration-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .last-updated {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 0, 122, 0.1);
+            border: 1px solid rgba(255, 0, 122, 0.3);
+            border-radius: 50px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Terms Container */
+        .terms-container {
+            position: relative;
+        }
+
+        .terms-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 2rem;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terms-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--gradient-1);
+            transition: height 0.4s ease;
+        }
+
+        .terms-card:hover {
+            border-color: rgba(255, 0, 122, 0.3);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .terms-card:hover::before {
+            height: 100%;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(255, 0, 122, 0.3);
+        }
+
+        .terms-card h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .terms-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 1.8rem 0 1rem;
+            color: var(--accent);
+        }
+
+        .terms-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .terms-list {
+            list-style: none;
+            margin: 1.2rem 0;
+        }
+
+        .terms-list li {
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            padding-left: 1.8rem;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        .terms-list li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .plan-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .plan-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .plan-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .plan-name {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-detail {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .price-tag {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .quote-block {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 1rem 1rem 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .contact-item i {
+            width: 24px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+    <div class="noise"></div>
+
+    <!-- Navigation -->
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 w-full z-[100] glass border-none px-4 md:px-8">
+        <!-- Logo -->
+        <div>
+            <img src="{{ url_for('static', filename='uploads/logos/logo1.png') }}" class="nav-logo" alt="Logo">
+        </div>
+         <a href="/" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+        
+        
+    </nav>
+
+    
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <div class="terms-header" data-aos="fade-up" data-aos-duration="1000">
+            <h1>Terms & Conditions</h1>
+            <div class="header-decoration">
+                <span class="decoration-line"></span>
+                <span class="decoration-icon"><i class="fas fa-gem"></i></span>
+                <span class="decoration-line"></span>
+            </div>
+
+        </div>
+
+        <!-- Terms Cards -->
+        <div class="terms-container">
+            <!-- Card 1: Introduction -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-icon">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <h2>Introduction</h2>
+                <p>Welcome to ScanStory. By accessing or using our website at myscanstory.com, you agree to be bound by
+                    these Terms and Conditions. ScanStory is an augmented reality platform that enables users to upload
+                    images and videos, generate QR codes, and create AR experiences for end-users to view through
+                    scanning.</p>
+
+            </div>
+
+            <!-- Card 2: Eligibility and Account -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2>Eligibility & Account</h2>
+                <p>To ensure a secure and fair environment for all users, we've established the following account
+                    guidelines:</p>
+                <ul class="terms-list">
+
+                    <li>You agree to provide accurate, current, and complete information during registration.</li>
+                    <li>You are solely responsible for maintaining the confidentiality of your account credentials.</li>
+                    <li>You are fully responsible for all activities that occur under your account.</li>
+                    <li>You must not share your account credentials with any third party.</li>
+                    <li>You agree to notify us immediately of any unauthorized access or breach of security.</li>
+                </ul>
+            </div>
+
+
+
+            <!-- Card 4: Payments and Billing -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="card-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h2>Payments & Billing</h2>
+                <ul class="terms-list">
+
+                    <li>All prices are in Indian Rupees (INR) and inclusive of applicable taxes.</li>
+                    <li>Subscriptions automatically renew at the end of each billing period.</li>
+                    <li>You may cancel automatic renewal at any time through your account settings.</li>
+                    <li>No refunds shall be issued for partial billing periods.</li>
+                    <li>Plan upgrades take effect immediately upon payment confirmation.</li>
+                    <li>Plan downgrades take effect at the start of the next billing cycle.</li>
+
+                </ul>
+            </div>
+
+            <!-- Card 5: Projects and Scans -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="card-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h2>Projects & Scans</h2>
+                <ul class="terms-list">
+                    <li>A "Project" constitutes one image-video pair with an associated QR code.</li>
+                    <li>A "Scan" constitutes one successful AR detection event by an end-user.</li>
+                    <li>Project limits are based on your current subscription plan.</li>
+                    <li>Deleting projects releases project slots for new creations.</li>
+                    <li>Scan limits reset monthly for active paid subscriptions.</li>
+                </ul>
+            </div>
+
+            <!-- Card 6: User Content -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="card-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h2>User Content</h2>
+                <ul class="terms-list">
+                    <li>You retain all ownership rights to the images and videos you upload.</li>
+                    <li>By uploading content, you grant ScanStory a non-exclusive, worldwide license to store, process,
+                        and display your content for service delivery.</li>
+                    <li>You represent and warrant that you own or have obtained all necessary rights to your uploaded
+                        content.</li>
+                    <li>You shall not upload content that infringes upon any third-party intellectual property rights.
+                    </li>
+                    <li>You shall not upload illegal, offensive, or inappropriate content.</li>
+                    <li>We reserve the right to remove any content that violates these Terms without prior notice.</li>
+                </ul>
+            </div>
+
+            <!-- Card 7: QR Codes and AR -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="700">
+                <div class="card-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <h2>QR Codes & AR Detection</h2>
+                <ul class="terms-list">
+                    <li>All QR codes generated through the platform are for your exclusive use.</li>
+                    <li>Downloaded QR codes remain your property and may be used indefinitely.</li>
+                    <li>QR codes remain functional only while your subscription remains active.</li>
+
+                    <li>Detection accuracy depends on image quality, lighting conditions, and end-user device
+                        capabilities.</li>
+                    <li>We do not guarantee 100% detection success across all devices and environments.</li>
+                </ul>
+            </div>
+
+            <!-- Card 8: Prohibited Activities -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="800">
+                <div class="card-icon">
+                    <i class="fas fa-ban"></i>
+                </div>
+                <h2>Prohibited Activities</h2>
+                <p>You agree not to engage in any of the following:</p>
+                <ul class="terms-list">
+                    <li>Uploading content that violates any applicable law or regulation.</li>
+                    <li>Infringing upon the intellectual property rights of others.</li>
+                    <li>Sharing account credentials with unauthorized users.</li>
+                    <li>Reverse engineering, decompiling, or disassembling the platform.</li>
+                    <li>Scraping, data mining, or using automated tools to extract platform data.</li>
+                    <li>Using the platform for any unlawful or harmful purpose.</li>
+                    <li>Interfering with the proper functioning of the platform.</li>
+                </ul>
+            </div>
+
+            <!-- Card 9: Intellectual Property -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="900">
+                <div class="card-icon">
+                    <i class="fas fa-copyright"></i>
+                </div>
+                <h2>Intellectual Property</h2>
+                <ul class="terms-list">
+                    <li>ScanStory owns all rights, title, and interest in the platform software, code, design, and
+                        technology.</li>
+                    <li>The ScanStory name, logo, and branding are our exclusive trademarks.</li>
+                    <li>You may not copy, modify, or create derivative works of our platform without written consent.
+                    </li>
+                    <li>You may not use our trademarks or branding without prior written permission.</li>
+                </ul>
+            </div>
+
+            <!-- Card 11: Privacy and Data -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1000">
+                <div class="card-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2>Privacy & Data Protection</h2>
+                <ul class="terms-list">
+                    <li>Your use of the platform is governed by our Privacy Policy.</li>
+                    <li>We collect, process, and store personal information as described in our Privacy Policy.</li>
+                    <li>By using the platform, you consent to our data practices as outlined in the Privacy Policy.</li>
+                </ul>
+            </div>
+
+
+
+            <!-- Card 14: Limitation of Liability -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1200">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>Limitation of Liability</h2>
+                <ul class="terms-list">
+                    <li>To the maximum extent permitted by law, ScanStory shall not be liable for any indirect,
+                        incidental, special, consequential, or punitive damages.</li>
+                    <li>We shall not be liable for any loss of profits, revenue, data, or business opportunities.</li>
+                    <li>Our total liability to you shall not exceed the amounts paid by you to us in the twelve months
+                        preceding the claim.</li>
+                </ul>
+            </div>
+
+            <!-- Card 15: Indemnification -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1300">
+                <div class="card-icon">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <h2>Indemnification</h2>
+                <p>You agree to indemnify and hold ScanStory harmless from any claims, damages, losses, and expenses
+                    arising from:</p>
+                <ul class="terms-list">
+                    <li>Your uploaded content.</li>
+                    <li>Your use of the platform.</li>
+                    <li>Your violation of these Terms.</li>
+                    <li>Your violation of any third-party rights.</li>
+                </ul>
+            </div>
+
+            <!-- Card 17: Termination -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1400">
+                <div class="card-icon">
+                    <i class="fas fa-power-off"></i>
+                </div>
+                <h2>Termination</h2>
+                <ul class="terms-list">
+
+                    <li>We may suspend or terminate your account for violation of these Terms, non-payment, illegal
+                        activity, or extended inactivity.</li>
+                    <li>Upon termination, your license to use the platform immediately ceases.</li>
+                    <li>Your content may be permanently deleted after 30 days of termination.</li>
+                    <li>No refunds shall be issued for prepaid periods upon termination.</li>
+                </ul>
+            </div>
+
+            <!-- Card 18: Modifications -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1500">
+                <div class="card-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h2>Modifications to Terms</h2>
+                <ul class="terms-list">
+                    <li>We reserve the right to modify these Terms at any time.</li>
+                    <li>Changes become effective immediately upon posting to the website.</li>
+                    <li>Material changes will be notified via email or platform notice.</li>
+                    <li>Your continued use of the platform constitutes acceptance of modified Terms.</li>
+                </ul>
+            </div>
+
+            <!-- Card 19: Governing Law -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1600">
+                <div class="card-icon">
+                    <i class="fas fa-scale-balanced"></i>
+                </div>
+                <h2>Governing Law & Dispute Resolution</h2>
+                <ul class="terms-list">
+                    <li>These Terms shall be governed by the laws of India.</li>
+                    <li>Any disputes arising under these Terms shall first be attempted through good-faith negotiation.
+                    </li>
+                    <li>If disputes cannot be resolved through negotiation, they shall be submitted to the exclusive
+                        jurisdiction of the courts in Bengaluru, India.</li>
+                    <li>You waive any right to participate in class action lawsuits against ScanStory.</li>
+                </ul>
+            </div>
+
+            <!-- Card 20: General Provisions -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1700">
+                <div class="card-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <h2>General Provisions</h2>
+                <ul class="terms-list">
+                    <li>These Terms constitute the entire agreement between you and ScanStory.</li>
+                    <li>If any provision is found unenforceable, the remaining provisions shall remain in full force.
+                    </li>
+                    <li>Our failure to enforce any right does not constitute waiver of that right.</li>
+                    <li>You may not assign your rights under these Terms without our written consent.</li>
+                    <li>We may assign our rights and obligations without restriction.</li>
+                </ul>
+            </div>
+
+            <!-- Card 21: Contact Information -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1800">
+                <div class="card-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h2>Contact Information</h2>
+                <p>For questions regarding these Terms, please contact us at:</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>scanstory.service@gmail.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>+91 99451 48412</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-globe"></i>
+                        <span>myscanstory.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright Notice -->
+            <div class="terms-card" data-aos="fade-up" data-aos-delay="1900" style="text-align: center;">
+                <div class="card-icon" style="margin: 0 auto 1.5rem;">
+                    <i class="fas fa-copyright"></i>
+                </div>
+                <p style="font-size: 1.1rem; color: var(--text-primary);">© 2024 ScanStory. All rights reserved.</p>
+                <p style="color: var(--text-muted); margin-top: 1rem;">By using ScanStory, you acknowledge that you have
+                    read, understood, and agree to be bound by these Terms and Conditions.</p>
+            </div>
+        </div>
+    </main>
+
+    
+
+    <!-- AOS Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 50
+        });
+
+
+        // Mobile Menu
+        const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuToggle && menuClose && mobileMenu) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            menuClose.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+
+    </script>
+</body>
+
+</html>

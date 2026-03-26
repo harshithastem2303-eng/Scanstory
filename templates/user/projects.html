@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Projects | ScanStory</title>
+
+    <!-- ================= CSS ================= -->
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", sans-serif;
+            background: radial-gradient(circle at top left, #1a0d1f, #000);
+            color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ---------- NAVBAR ---------- */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 30px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-left a,
+        .nav-right a {
+            margin-right: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 22px;
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #ff007a;
+            border-color: #ff007a;
+        }
+
+        .btn-danger:hover {
+            background: #ff3b3b;
+            border-color: #ff3b3b;
+        }
+
+        /* ---------- PAGE ---------- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        /* ---------- PROJECT GRID ---------- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-card h3 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .project-meta {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+
+        /* ---------- ACTIONS ---------- */
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .actions form {
+            display: inline;
+        }
+
+        /* ---------- EMPTY ---------- */
+        .empty {
+            text-align: center;
+            opacity: 0.7;
+            margin-top: 60px;
+        }
+    </style>
+    <!-- ====================================== -->
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="top-bar">
+        <div class="nav-left">
+            <a href="{{ url_for('dashboard') }}" class="btn">
+                ← Dashboard
+            </a>
+        </div>
+
+        <div class="nav-right">
+            <a href="{{ url_for('projects_page') }}" class="btn">
+                Projects
+            </a>
+            <a href="{{ url_for('user_profile') }}" class="btn">
+                Profile
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">
+                Logout
+            </a>
+        </div>
+    </header>
+    <!-- ========================================== -->
+
+    <!-- ================= CONTENT ================= -->
+    <main class="container">
+
+        <h1 class="page-title">My Projects</h1>
+
+        {% if projects %}
+        <div class="projects-grid">
+            {% for project in projects %}
+            <div class="project-card">
+                <h3>{{ project.name }}</h3>
+
+                <div class="project-meta">
+                    Created: {{ project.created_at.strftime('%d %b %Y') }}<br>
+                    Pairs: {{ project.pairs_count }}
+                </div>
+
+                <div class="actions">
+                    <a href="{{ url_for('project_view', project_id=project.id) }}" class="btn">
+                        View
+                    </a>
+
+                    <a href="{{ url_for('download_project_qr', project_id=project.id) }}" class="btn">
+                        QR
+                    </a>
+
+                    <form method="POST" action="{{ url_for('user_delete_project', project_id=project.id) }}"
+                        onsubmit="return confirm('Delete this project?');">
+                        <button type="submit" class="btn btn-danger">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">
+            <h3>No projects yet</h3>
+            <p>Create your first project from the dashboard.</p>
+        </div>
+        {% endif %}
+
+        {% if user.subscription_status == 'limit_reached' %}
+        <div class="bg-yellow-500/10 border border-yellow-500/20 text-yellow-300 px-4 py-3 rounded-xl mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle mr-3"></i>
+                <span>
+                    You've reached your plan limit.
+                    <a href="{{ url_for('subscribe_page') }}" class="underline font-bold hover:text-yellow-400">
+                        Upgrade to create more projects
+                    </a>
+                </span>
+            </div>
+        </div>
+        {% endif %}
+
+    </main>
+    <!-- ========================================== -->
+
+</body>
+
+</html>
